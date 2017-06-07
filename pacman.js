@@ -926,6 +926,10 @@ var generateNewAnswers = function() {
             answerBalls[i].j = Math.floor(Math.random()*21);
         }
         positions.push([answerBalls[i].i, answerBalls[i].j]);
+        positions.push([answerBalls[i].i-1, answerBalls[i].j]);
+        positions.push([answerBalls[i].i+1, answerBalls[i].j]);
+        positions.push([answerBalls[i].i, answerBalls[i].j-1]);
+        positions.push([answerBalls[i].i, answerBalls[i].j+1]);
     }
     answerBalls.push({
         value: number1 + number2,
