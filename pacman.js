@@ -13,6 +13,13 @@ window.onfocus = function() {
 var paused = true;
 var lives = 5;
 var blockWidth = 26.95, blockHeight = 23;//22.86;
+var thinking;
+var thinkingTimeStart;
+
+var beepSound = new Audio('sounds/beep.wav');
+var deadSound = new Audio('sounds/dead.wav');
+var correctSound = new Audio('sounds/correct.mp3');
+var wrongSound = new Audio('sounds/wrong.wav');
 
 var canvas = document.getElementById("canvasHolder");
 var ctx = canvas.getContext("2d");
@@ -289,7 +296,7 @@ pacman.update = function(delta) {
         var distX = Math.abs(ghosts[p].x - this.x);
         var distY = Math.abs(ghosts[p].y - this.y);
         if(distX + distY < 20) {
-            paused = true;
+            //paused = true;
             decreaseLife();
             return;
         }
@@ -302,8 +309,10 @@ pacman.update = function(delta) {
             //TODO : check if answer is correct or not
             if(answerBalls[p].value == number1 + number2) {
                 SCORE += 5;
+                correctSound.play();
             } else {
                 SCORE -= 1;
+                wrongSound.play();
             }
             answered = true;
             break;
@@ -749,20 +758,26 @@ var movable = [
 //handle keyboard controls
 addEventListener("keydown", function(e) {
     switch(e.keyCode) {
-        case 37: pacman.changeDirection("left"); paused = false; break;
-        case 38: pacman.changeDirection("up"); paused = false; break;
-        case 39: pacman.changeDirection("right"); paused = false; break;
-        case 40: pacman.changeDirection("down"); paused = false; break;
+        case 37: pacman.changeDirection("left"); break;
+        case 38: pacman.changeDirection("up"); break;
+        case 39: pacman.changeDirection("right"); break;
+        case 40: pacman.changeDirection("down"); break;
     }
 }, false);
 
 var update = function(delta) {
-    if(pacReady && !paused && !GAMEOVER) {
-        pacman.update(delta);
+    if(Date.now() - thinkingTimeStart >= 5000) {
+        //thinking time is now over
+        thinking = false;
     }
-    if(ghostImageReady && !paused && !GAMEOVER) {
-        for(var i = 0; i < 4; i++) {
-            ghosts[i].update(delta);
+    if(!GAMEOVER && !paused && !thinking) {
+        if(pacReady) {
+            pacman.update(delta);
+        }
+        if(ghostImageReady) {
+            for(var i = 0; i < 4; i++) {
+                ghosts[i].update(delta);
+            }
         }
     }
 }
@@ -802,15 +817,28 @@ var render = function() {
         ctx.textAlign = 'center';
         ctx.fillText(answerBalls[i].value, answerBalls[i].j*blockWidth  + blockWidth/2, answerBalls[i].i*blockHeight +blockHeight/2 + 5);
     }
+    if(thinking) {
+        ctx.font = '50px "TooneyNoodleNF"';
+        var t = 5 - Math.floor((Date.now() - thinkingTimeStart)/1000);
+        if(t != secondsLeft) {
+            beepSound.play();
+            secondsLeft = t;
+        }
+        ctx.fillText("Solve in:" + secondsLeft, canvas.width/2, canvas.height/2);
+    }
 }
 
 var renderQ = function() {
     if(answered) {
         //generate new question
-        number1 = Math.ceil(Math.random()*10);
-        number2 = Math.ceil(Math.random()*10);
+        number1 = Math.floor(Math.random()*10);
+        number2 = Math.floor(Math.random()*10);
         generateNewAnswers();
         answered = false;
+        thinking = true;
+        thinkingTimeStart = Date.now();
+        secondsLeft = 5;
+        beepSound.play();
     }
     Qctx.fillStyle = "black";
     Qctx.fillRect(0, 0, Qcanvas.width, Qcanvas.height);
@@ -891,9 +919,18 @@ var reset = function() {
 
 var decreaseLife = function() {
     lives--;
-    if(lives == 0)
+    if(lives == 0) {
+        deadSound.play();
         gameOver();
+    }
     else {
+        //wait for a second
+        var t = Date.now();
+        //ctx.font = '50px "TooneyNoodleNF"';
+        //ctx.fillText("OUT!!!", canvas.width/2, canvas.height/2);
+        while(Date.now() - t < 1500) {
+
+        }
         reset();
     }
 }
@@ -901,17 +938,23 @@ var decreaseLife = function() {
 var gameOver = function() {
     paused = true;
     GAMEOVER = true;
-    console.log("game over");
 }
 
 var generateNewAnswers = function() {
     answerBalls.length = 0;
     var positions = [];
+    //pacman nearby positions
     positions.push([pacman.i, pacman.j]);
     positions.push([pacman.i-1, pacman.j]);
     positions.push([pacman.i+1, pacman.j]);
     positions.push([pacman.i, pacman.j-1]);
     positions.push([pacman.i, pacman.j+1]);
+    //ghosts' house
+    positions.push([9, 9]);
+    positions.push([9, 8]);
+    positions.push([9, 7]);
+    positions.push([8, 9]);
+
     for(var i = 0; i < 4; i++) {
         answerBalls.push({
             value: number1 + number2,
@@ -946,6 +989,8 @@ var generateNewAnswers = function() {
 var then = Date.now();
 GAMEOVER = false;
 SCORE = 0;
+thinking = true;
+paused = false;
 reset();
 main();
 
