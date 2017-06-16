@@ -3,8 +3,7 @@ var GAMEOVER;
 
 // experimenting something - achie27
 window.addEventListener('message', function(evt) { 
-	 console.log(evt.data);
-	 window.parent.postMessage(GAMEOVER, '*');
+	 window.parent.postMessage('score is ' + SCORE, '*');
  });
 // end
 
