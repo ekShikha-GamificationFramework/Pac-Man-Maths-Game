@@ -1,6 +1,13 @@
 var SCORE;
 var GAMEOVER;
 
+// experimenting something - achie27
+window.addEventListener('message', function(evt) { 
+	 console.log(evt.data);
+	 window.parent.postMessage(GAMEOVER, '*');
+ });
+// end
+
 window.onload = function () {
 
 /*window.onblur = function() {
