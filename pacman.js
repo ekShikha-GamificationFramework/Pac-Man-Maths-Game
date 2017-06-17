@@ -1,12 +1,6 @@
 var SCORE;
 var GAMEOVER;
 
-// experimenting something - achie27
-window.addEventListener('message', function(evt) { 
-	 window.parent.postMessage('score is ' + SCORE, '*');
- });
-// end
-
 window.onload = function () {
 
 /*window.onblur = function() {
@@ -944,6 +938,10 @@ var decreaseLife = function() {
 var gameOver = function() {
     paused = true;
     GAMEOVER = true;
+	
+	//sends score to the page this file will be embedded in - achie27
+	window.parent.postMessage(SCORE, '*');
+	//end
 }
 
 var generateNewAnswers = function() {
