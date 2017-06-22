@@ -106,6 +106,19 @@ var pacman = {
 };
 pacman.update = function(delta) {
     this.sprite.update();
+    //collision detection with ghosts
+    for(var p = 0; p < 4; p++) {
+        var distX = Math.abs(ghosts[p].x - this.x);
+        var distY = Math.abs(ghosts[p].y - this.y);
+	console.log("ghost = " + ghosts[p].i + ", " +ghosts[p].j);
+	console.log("pacman = " + this.i + ", " +this.j);
+        if(distX + distY < 20 || (ghosts[p].i == this.i && ghosts[p].j == this.j)) {
+            //paused = true;
+            decreaseLife();
+            return;
+        }
+    }
+
     if(this.target_i == null && this.target_j == null && this.nextDir == null) return;
     var change = this.speed * delta;
     if(!this.targetReached) {   //target is not yet reached
@@ -288,19 +301,6 @@ pacman.update = function(delta) {
                 }
                 break;
             default:
-        }
-    }
-
-    //collision detection with ghosts
-    for(var p = 0; p < 4; p++) {
-        var distX = Math.abs(ghosts[p].x - this.x);
-        var distY = Math.abs(ghosts[p].y - this.y);
-	console.log("ghost = " + ghosts[p].i + ", " +ghosts[p].j);
-	console.log("ghost = " + this.i + ", " +this.j);
-        if(distX + distY < 20 || (ghosts[p].i == this.i && ghosts[p].j == this.j)) {
-            //paused = true;
-            decreaseLife();
-            return;
         }
     }
 
