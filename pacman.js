@@ -295,7 +295,7 @@ pacman.update = function(delta) {
     for(var p = 0; p < 4; p++) {
         var distX = Math.abs(ghosts[p].x - this.x);
         var distY = Math.abs(ghosts[p].y - this.y);
-        if(distX + distY < 20 || (ghosts[p].i == this.i && ghosts[p].j == this.j)) {
+        if(distX + distY < 20 || (ghosts[p].i == this.target_i && ghosts[p].j == this.target_j)) {
             //paused = true;
             decreaseLife();
             return;
