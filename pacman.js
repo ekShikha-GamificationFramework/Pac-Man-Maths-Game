@@ -22,17 +22,14 @@ function parseURLParams(url) {
     return parms;
 }
 
-//reading the x and y parameters
-console.log(JSON.stringify(parseURLParams(window.location.href)));
+//reading the k parameter from the url
+var k = "1";
+var urlParams = parseURLParams(window.location.href);
+if(urlParams) {
+    k = urlParams["k"][0];
+}
 
 window.onload = function () {
-
-/*window.onblur = function() {
-    paused = true;
-}
-window.onfocus = function() {
-    paused = false;
-}*/
 
 var paused = true;
 var lives = 5;
@@ -814,15 +811,6 @@ var render = function() {
     if(pacReady) {
         pacman.render();
     }
- /*
-    ctx.fillStyle="#0000FF";
-    for(var i = 0; i < movable.length; i++) {
-        for(var j = 0; j < movable[0].length; j++) {
-            if(!movable[i][j]) {
-                ctx.fillRect(j*blockWidth, i*blockHeight, blockWidth, blockHeight);
-            }
-        }
-    }*/
     if(ghostImageReady) {
         for(var i = 0; i < 4; i++) {
             ghosts[i].render();
@@ -845,7 +833,7 @@ var render = function() {
         ctx.font = '50px "TooneyNoodleNF"';
         var t = 5 - Math.floor((Date.now() - thinkingTimeStart)/1000);
         if(t != secondsLeft) {
-            beepSound.play();
+            //beepSound.play();
             secondsLeft = t;
         }
         ctx.fillText("Solve in:" + secondsLeft, canvas.width/2, canvas.height/2);
@@ -855,14 +843,13 @@ var render = function() {
 var renderQ = function() {
     if(answered) {
         //generate new question
-        number1 = Math.floor(Math.random()*10);
-        number2 = Math.floor(Math.random()*10);
+        newQuestion();
         generateNewAnswers();
         answered = false;
         thinking = true;
         thinkingTimeStart = Date.now();
         secondsLeft = 5;
-        beepSound.play();
+        //beepSound.play();
     }
     Qctx.fillStyle = "black";
     Qctx.fillRect(0, 0, Qcanvas.width, Qcanvas.height);
@@ -875,7 +862,23 @@ var renderQ = function() {
     Qctx.textAlign = 'center';
     Qctx.font = '60px "TooneyNoodleNF"';
     if(!GAMEOVER) {
-        Qctx.fillText(number1 + " + " + number2 + " = ?", Qcanvas.width/2, 10);
+        var operation;
+        switch (k) {
+            case "1": //add
+                operation = "+";
+                break;
+            case "2": //subtract
+                operation = "-";
+                break;
+            case "3": //multiply
+                operation = "X";
+                break;
+            case "4": //divide
+                operation = "/";
+                break;
+            default:operation = "+";
+        }
+        Qctx.fillText(number1 + " " + operation + " " + number2 + " = ?", Qcanvas.width/2, 10);
     } else {
         Qctx.fillText("GAME OVER!!!", Qcanvas.width/2, 10);
     }
@@ -962,10 +965,28 @@ var decreaseLife = function() {
 var gameOver = function() {
     paused = true;
     GAMEOVER = true;
-	
+
 	//sends score to the page this file will be embedded in - achie27
 	window.parent.postMessage(SCORE, '*');
 	//end
+}
+
+function newQuestion() {
+    //generate new question based on type
+    number1 = Math.floor(Math.random()*20)+10;
+    number2 = Math.floor(Math.random()*number1);  //number2 will be smaller than number1
+    if(k == "4") {   //division
+        while(number1%number2 != 0) {
+            number2--;
+            if(number2 == 0) {
+                break;
+            }
+        }
+        if(number2 == 0) {
+            number2 = number1 / 2;
+            number1 = 2 * number2;
+        }
+    }
 }
 
 var generateNewAnswers = function() {
@@ -983,13 +1004,30 @@ var generateNewAnswers = function() {
     positions.push([9, 7]);
     positions.push([8, 9]);
 
+    var ans;
+    switch (k) {
+        case "1": //add
+            ans = number1 + number2;
+            break;
+        case "2": //subtract
+            ans = number1 - number2;
+            break;
+        case "3": //multiply
+            ans = number1 * number2;
+            break;
+        case "4": //divide
+            ans = number1 / number2;
+            break;
+        default:ans = number1+number2;
+    }
+
     for(var i = 0; i < 4; i++) {
         answerBalls.push({
-            value: number1 + number2,
+            value: ans,
             i: Math.floor(Math.random()*19),
             j: Math.floor(Math.random()*21)
         });
-        while(answerBalls[i].value == number1 + number2) {
+        while(answerBalls[i].value == ans) {
             answerBalls[i].value = Math.floor(Math.random()*40);
         }
         while(!movable[answerBalls[i].i][answerBalls[i].j] || !notInArray(positions, answerBalls[i].i, answerBalls[i].j)) {
@@ -1003,7 +1041,7 @@ var generateNewAnswers = function() {
         positions.push([answerBalls[i].i, answerBalls[i].j+1]);
     }
     answerBalls.push({
-        value: number1 + number2,
+        value: ans,
         i: Math.floor(Math.random()*19),
         j: Math.floor(Math.random()*21)
     });
