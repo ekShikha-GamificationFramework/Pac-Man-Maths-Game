@@ -1,6 +1,6 @@
 var SCORE;
 var GAMEOVER;
-
+console.log(window.location.href);
 window.onload = function () {
 
 /*window.onblur = function() {
