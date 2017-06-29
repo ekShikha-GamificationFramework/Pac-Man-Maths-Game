@@ -335,6 +335,10 @@ pacman.update = function(delta) {
                 SCORE -= 1;
                 wrongSound.play();
             }
+	    //sends score to the page this file will be embedded in
+	    var obj = {GAMEOVER: GAMEOVER, SCORE: SCORE};
+	    window.parent.postMessage(obj, '*');
+	    //end
             answered = true;
             break;
         }
@@ -902,10 +906,6 @@ var renderQ = function() {
 
 //the main game loop
 var main = function() {
-    //sends score to the page this file will be embedded in
-    var obj = {GAMEOVER: GAMEOVER, SCORE: SCORE};
-    window.parent.postMessage(obj, '*');
-    //end
     var now = Date.now();
     var delta = now - then;
 
@@ -978,6 +978,10 @@ var decreaseLife = function() {
 var gameOver = function() {
     paused = true;
     GAMEOVER = true;
+    //sends score to the page this file will be embedded in
+    var obj = {GAMEOVER: GAMEOVER, SCORE: SCORE};
+    window.parent.postMessage(obj, '*');
+    //end
 }
 
 function newQuestion() {
