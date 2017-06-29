@@ -36,6 +36,7 @@ var lives = 5;
 var blockWidth = 26.95, blockHeight = 23;//22.86;
 var thinking;
 var thinkingTimeStart;
+var previousResponseTime = 500, responseTimeDiff = 500;   //Difference between the players response time, default is 500 ms
 
 var beepSound = new Audio('sounds/beep.wav');
 var deadSound = new Audio('sounds/dead.wav');
@@ -784,6 +785,8 @@ addEventListener("keydown", function(e) {
         case 39: pacman.changeDirection("right"); break;
         case 40: pacman.changeDirection("down"); break;
     }
+    responseTimeDiff = Date.now() - lastClicked;
+    lastClicked = Date.now();
 }, false);
 
 var update = function(delta) {
@@ -799,6 +802,13 @@ var update = function(delta) {
             for(var i = 0; i < 4; i++) {
                 ghosts[i].update(delta);
             }
+        }
+        if(responseTimeDiff > 400) {
+            ghosts[0].speed -= 0.01;
+            ghosts[3].speed -= 0.01;
+        } else {
+            ghosts[0].speed += 0.01;
+            ghosts[3].speed += 0.01;
         }
     }
 }
@@ -1053,6 +1063,7 @@ var generateNewAnswers = function() {
 
 //lets play the game
 var then = Date.now();
+var lastClicked = then;
 GAMEOVER = false;
 SCORE = 0;
 thinking = true;
