@@ -328,8 +328,7 @@ pacman.update = function(delta) {
     for(var p = 0; p < answerBalls.length; p++) {
         if(this.i == answerBalls[p].i && this.j == answerBalls[p].j) {
             //collision detected
-            //TODO : check if answer is correct or not
-            if(answerBalls[p].value == number1 + number2) {
+            if(answerBalls[p].value == ans) {
                 SCORE += 5;
                 correctSound.play();
             } else {
@@ -903,6 +902,10 @@ var renderQ = function() {
 
 //the main game loop
 var main = function() {
+    //sends score to the page this file will be embedded in
+    var obj = {GAMEOVER: GAMEOVER, SCORE: SCORE};
+    window.parent.postMessage(obj, '*');
+    //end
     var now = Date.now();
     var delta = now - then;
 
@@ -975,17 +978,17 @@ var decreaseLife = function() {
 var gameOver = function() {
     paused = true;
     GAMEOVER = true;
-
-	//sends score to the page this file will be embedded in - achie27
-	window.parent.postMessage(SCORE, '*');
-	//end
 }
 
 function newQuestion() {
     //generate new question based on type
     number1 = Math.floor(Math.random()*20)+10;
     number2 = Math.floor(Math.random()*number1);  //number2 will be smaller than number1
-    if(k == "4") {   //division
+    if(k == "3) {
+    	//multiplication - small numbers
+        number1 = Math.floor(Math.random()*20);
+	number2 = Math.floor(Math.random()*10);
+    } else if(k == "4") {   //division
         while(number1%number2 != 0) {
             number2--;
             if(number2 == 0) {
@@ -998,7 +1001,7 @@ function newQuestion() {
         }
     }
 }
-
+var ans;
 var generateNewAnswers = function() {
     answerBalls.length = 0;
     var positions = [];
@@ -1014,7 +1017,6 @@ var generateNewAnswers = function() {
     positions.push([9, 7]);
     positions.push([8, 9]);
 
-    var ans;
     switch (k) {
         case "1": //add
             ans = number1 + number2;
