@@ -987,7 +987,7 @@ function newQuestion() {
     if(k == "3") {
     	//multiplication - small numbers
         number1 = Math.floor(Math.random()*20);
-	number2 = Math.floor(Math.random()*10);
+	number2 = Math.floor(Math.random()*10) + 2;
     } else if(k == "4") {   //division
         while(number1%number2 != 0) {
             number2--;
