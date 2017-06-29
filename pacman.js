@@ -984,7 +984,7 @@ function newQuestion() {
     //generate new question based on type
     number1 = Math.floor(Math.random()*20)+10;
     number2 = Math.floor(Math.random()*number1);  //number2 will be smaller than number1
-    if(k == "3) {
+    if(k == "3") {
     	//multiplication - small numbers
         number1 = Math.floor(Math.random()*20);
 	number2 = Math.floor(Math.random()*10);
