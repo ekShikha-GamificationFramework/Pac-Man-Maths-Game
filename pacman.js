@@ -806,6 +806,7 @@ var update = function(delta) {
                 ghosts[i].update(delta);
             }
         }
+        //change the speed of ghosts (following pacman) according to the response time of player
         if(responseTimeDiff > 400) {
             ghosts[0].speed -= 0.01;
             ghosts[3].speed -= 0.01;
@@ -875,23 +876,7 @@ var renderQ = function() {
     Qctx.textAlign = 'center';
     Qctx.font = '60px "TooneyNoodleNF"';
     if(!GAMEOVER) {
-        var operation;
-        switch (k) {
-            case "1": //add
-                operation = "+";
-                break;
-            case "2": //subtract
-                operation = "-";
-                break;
-            case "3": //multiply
-                operation = "X";
-                break;
-            case "4": //divide
-                operation = "/";
-                break;
-            default:operation = "+";
-        }
-        Qctx.fillText(number1 + " " + operation + " " + number2 + " = ?", Qcanvas.width/2, 10);
+        Qctx.fillText(number1 + " " + operationString + " " + number2 + " = ?", Qcanvas.width/2, 10);
     } else {
         Qctx.fillText("GAME OVER!!!", Qcanvas.width/2, 10);
     }
@@ -983,11 +968,187 @@ var gameOver = function() {
     window.parent.postMessage(obj, '*');
     //end
 }
-
+var ans, maxAnswerRandVal, operationString;
 function newQuestion() {
     //generate new question based on type
     number1 = Math.floor(Math.random()*20)+10;
     number2 = Math.floor(Math.random()*number1);  //number2 will be smaller than number1
+    ans = number1 + number2;
+    operationString = "+";
+    maxAnswerRandVal = 40;
+    switch (k) {
+        case "1": //add
+            ans = number1 + number2;
+            operationString = "+";
+            break;
+        case "2": //subtract
+            ans = number1 - number2;
+            operationString = "-";
+            break;
+        case "3": //multiply
+            ans = number1 * number2;
+            operationString = "X";
+            break;
+        case "4": //divide
+            ans = number1 / number2;
+            operationString = "/";
+            break;
+        case "7":   //Addition: Single Digit
+            number1 = Math.floor(Math.random()*10);
+            number2 = Math.floor(Math.random()*10);
+            while(number1 + number2 >= 10) {
+                if(number1 > 0) number1--;else number2--;
+            }
+            maxAnswerRandVal = 15;
+            ans = number1 + number2;
+            operationString = "+";
+            break;
+        case "8":   //Addition: Single Digit with carry
+            number1 = Math.floor(Math.random()*10);
+            number2 = Math.floor(Math.random()*10);
+            while(number1 + number2 < 10) {
+                number1 = Math.floor(Math.random()*10);
+                number2 = Math.floor(Math.random()*10);
+            }
+            maxAnswerRandVal = 22;
+            ans = number1 + number2;
+            operationString = "+";
+            break;
+        case "9":   //Addition: Two Digit
+            number1 = Math.floor(Math.random()*10);
+            number2 = Math.floor(Math.random()*10);
+            while(number1 + number2 >= 10) {
+                number1 = Math.floor(Math.random()*10);
+                number2 = Math.floor(Math.random()*10);
+            }
+            var x = number1, y = number2;
+            number1 = Math.floor(Math.random()*10);
+            number2 = Math.floor(Math.random()*10);
+            while(number1 + number2 >= 10) {
+                number1 = Math.floor(Math.random()*10);
+                number2 = Math.floor(Math.random()*10);
+            }
+            number1 = number1 * 10 + x;
+            number2 = number2 * 10 + y;
+            maxAnswerRandVal = 100;
+            ans = number1 + number2;
+            operationString = "+";
+            break;
+        case "10":  //Addition: Two Digit with carry
+            number1 = Math.floor(Math.random()*90) + 10;
+            number2 = Math.floor(Math.random()*90) + 10;
+            maxAnswerRandVal = 200;
+            ans = number1 + number2;
+            operationString = "+";
+            break;
+        case "11":  //Addition: Three Digit
+            number1 = Math.floor(Math.random()*900) + 100;
+            number2 = Math.floor(Math.random()*900) + 100;
+            maxAnswerRandVal = 2000;
+            ans = number1 + number2;
+            operationString = "+";
+            break;
+        case "12":  //Subtraction: Single Digit
+            number1 = Math.floor(Math.random()*10) + 1;
+            number2 = Math.floor(Math.random()*number1);
+            maxAnswerRandVal = 10;
+            ans = number1 - number2;
+            operationString = "-";
+            break;
+        case "13":  //Subtraction: Two Digit
+            number1 = Math.floor(Math.random()*9) + 1;
+            number2 = Math.floor(Math.random()*number1);
+            var x = Math.floor(Math.random()*9) + 1;
+            number1 = number1 * 10 + x;
+            number2 = number2 * 10 + Math.floor(Math.random()*x);
+            maxAnswerRandVal = 100;
+            ans = number1 - number2;
+            operationString = "-";
+            break;
+        case "14":  //Subtraction: Two Digit with Borrow
+            number1 = Math.floor(Math.random()*80) + 20;
+            number2 = Math.floor(Math.random()*number1-10) + 10;
+            maxAnswerRandVal = 100;
+            ans = number1 - number2;
+            operationString = "-";
+            break;
+        case "15":  //Subtraction: Three Digit
+            number1 = Math.floor(Math.random()*9) + 1;
+            number2 = Math.floor(Math.random()*number1);
+            var x = Math.floor(Math.random()*9) + 1;
+            number1 = number1 * 10 + x;
+            number2 = number2 * 10 + Math.floor(Math.random()*x);
+            x = Math.floor(Math.random()*9) + 1;
+            number1 = number1 * 10 + x;
+            number2 = number2 * 10 + Math.floor(Math.random()*x);
+            maxAnswerRandVal = 1000;
+            ans = number1 - number2;
+            operationString = "-";
+            break;
+        case "16":  //Subtraction: Three Digit with Borrow
+            number1 = Math.floor(Math.random()*800) + 200;
+            number2 = Math.floor(Math.random()*number1);
+            maxAnswerRandVal = 1000;
+            ans = number1 - number2;
+            operationString = "-";
+            break;
+        case "17":  //Multiplication: Single Digit
+            number1 = Math.floor(Math.random()*10);
+            number2 = Math.floor(Math.random()*10);
+            maxAnswerRandVal = 100;
+            ans = number1 * number2;
+            operationString = "X";
+            break;
+        case "18":  //Multiplication: Single Digit with Two Digit
+            number1 = Math.floor(Math.random()*100);
+            number2 = Math.floor(Math.random()*10);
+            maxAnswerRandVal = 990;
+            ans = number1 * number2;
+            operationString = "X";
+            break;
+        case "19":  //Multiplication: Two Digit with Two Digit
+            number1 = Math.floor(Math.random()*90) + 10;
+            number2 = Math.floor(Math.random()*90) + 10;
+            maxAnswerRandVal = 9900;
+            ans = number1 * number2;
+            operationString = "X";
+            break;
+        case "20":  //Division: Single Digit
+            number1 = Math.floor(Math.random()*9) + 1;
+            number2 = Math.floor(Math.random()*(number2)) + 1; //minimum is 1
+            while(number1%number2 != 0 && number2 > 1) {
+                number2--;
+            }
+            maxAnswerRandVal = 11;
+            ans = number1 / number2;
+            operationString = "/";
+            break;
+        case "21":  //Division: Two Digit by Single Digit
+            number1 = Math.floor(Math.random()*90) + 10;
+            number2 = Math.floor(Math.random()*(number2)) + 1;
+            while(number1%number2 != 0 && number2 > 1) {
+                number2--;
+            }
+            maxAnswerRandVal = 50;
+            ans = number1 / number2;
+            operationString = "/";
+            break;
+        case "22":  //Division: Two Digit by Two Digit
+            number1 = Math.floor(Math.random()*90) + 10;
+            number2 = Math.floor(Math.random()*number1) + 1;
+            while(number1%number2 != 0 && number2 > 1) {
+                number2--;
+            }
+            maxAnswerRandVal = 50;
+            ans = number1 / number2;
+            operationString = "/";
+            break;
+        default:
+            ans = number1 + number2;
+            maxAnswerRandVal = 40;
+    }
+
+    //other cases {1, 2, 3, 4}
     if(k == "3") {
     	//multiplication - small numbers
         number1 = Math.floor(Math.random()*20);
@@ -1005,7 +1166,6 @@ function newQuestion() {
         }
     }
 }
-var ans;
 var generateNewAnswers = function() {
     answerBalls.length = 0;
     var positions = [];
@@ -1021,22 +1181,6 @@ var generateNewAnswers = function() {
     positions.push([9, 7]);
     positions.push([8, 9]);
 
-    switch (k) {
-        case "1": //add
-            ans = number1 + number2;
-            break;
-        case "2": //subtract
-            ans = number1 - number2;
-            break;
-        case "3": //multiply
-            ans = number1 * number2;
-            break;
-        case "4": //divide
-            ans = number1 / number2;
-            break;
-        default:ans = number1+number2;
-    }
-
     for(var i = 0; i < 4; i++) {
         answerBalls.push({
             value: ans,
@@ -1044,7 +1188,7 @@ var generateNewAnswers = function() {
             j: Math.floor(Math.random()*21)
         });
         while(answerBalls[i].value == ans) {
-            answerBalls[i].value = Math.floor(Math.random()*40);
+            answerBalls[i].value = Math.floor(Math.random()*maxAnswerRandVal);
         }
         while(!movable[answerBalls[i].i][answerBalls[i].j] || !notInArray(positions, answerBalls[i].i, answerBalls[i].j)) {
             answerBalls[i].i = Math.floor(Math.random()*19);
