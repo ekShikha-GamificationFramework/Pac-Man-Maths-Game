@@ -1155,9 +1155,11 @@ function newQuestion() {
 	    number2 = Math.floor(Math.random()*10) + 2;
         ans = number1 * number2;
     } else if(k == "4") {   //division
+        number1 = Math.floor(Math.random()*20);
+	    number2 = Math.floor(Math.random()*10) + 2;
         while(number1%number2 != 0) {
             number2--;
-            if(number2 == 0) {
+            if(number2 <= 1) {
                 break;
             }
         }
