@@ -982,7 +982,7 @@ function newQuestion() {
             operationString = "+";
             break;
         case "2": //subtract
-            ans = number1 - number2;
+            ans = number2 - number1;
             operationString = "-";
             break;
         case "3": //multiply
@@ -1152,7 +1152,8 @@ function newQuestion() {
     if(k == "3") {
     	//multiplication - small numbers
         number1 = Math.floor(Math.random()*20);
-	number2 = Math.floor(Math.random()*10) + 2;
+	    number2 = Math.floor(Math.random()*10) + 2;
+        ans = number1 * number2;
     } else if(k == "4") {   //division
         while(number1%number2 != 0) {
             number2--;
@@ -1164,6 +1165,7 @@ function newQuestion() {
             number2 = number1 / 2;
             number1 = 2 * number2;
         }
+        ans = number1 / number2;
     }
 }
 var generateNewAnswers = function() {
