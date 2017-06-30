@@ -1160,6 +1160,8 @@ function newQuestion() {
         while(number1%number2 != 0) {
             number2--;
             if(number2 <= 1) {
+                number1 = 8;
+                number2 = 4;
                 break;
             }
         }
